@@ -75,7 +75,7 @@ app.post('/products', (req, res) => {
 
 
     const newId = products.length > 0 ? products[products.length - 1].id + 1 : 1;
-    const addedProduct = { 
+    const NewProduct = { 
         id: newId, 
         name: name.trim(), 
         price, 
@@ -83,10 +83,10 @@ app.post('/products', (req, res) => {
         ...(image && { image })
     };
 
-    products.push(addedProduct);
+    products.push(NewProduct);
     res.status(201).json({
-        message: "Продукт успешно добавлен!",
-        product: addedProduct
+        message: "Продукт було успішно додано",
+        product: NewProduct
     });
 });
 
