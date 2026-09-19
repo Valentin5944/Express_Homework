@@ -2,21 +2,19 @@ import express from "express"
 
 const app = express();
 
+// ОБОВ'ЯЗКОВО: додаємо middleware для читання JSON з Postman
+app.use(express.json());
+
 const HOST = 'localhost';
 const PORT = 3000;
 
 app.get('/timestamp', (req, res) => {
     const currentDate = new Date();
-
-    res.json({
-        timestamp: currentDate.toISOString()
-    });
+    res.json({ timestamp: currentDate.toISOString() });
 });
 
 app.get('/health', (req, res) => {
-    res.json({
-        status: "ok"
-    });
+    res.json({ status: "ok" });
 });
 
 app.get('/stats', (req, res) => {
@@ -46,13 +44,11 @@ app.get('/products', (req, res) => {
             filteredProducts = filteredProducts.slice(0, count);
         }
     }
-
     res.json(filteredProducts);
 });
 
 app.get('/products/:id', (req, res) => {
     const targetId = Number(req.params.id);
-
     const foundProduct = products.find(product => product.id === targetId);
 
     if (!foundProduct) {
@@ -61,9 +57,37 @@ app.get('/products/:id', (req, res) => {
     res.json(foundProduct);
 });
 
+app.post('/products', (req, res) => {
+    if (req.query.fail === 'true') {
+        return res.status(500).json({ error: "Помилка при додаванні продукту" });
+    }
+    
+    const { name, price, category, image } = req.body;
+
+    if (!name || typeof name !== 'string' || name.trim().length === 0 || !Number.isInteger(price) || price <= 0 || !category || typeof category !== 'string' || category.trim().length === 0 || image && typeof image !== 'string') {
+        return res.status(422).json({ error: "Semantic Error" });
+    }
+    if (products.some(product => product.name === name)) {
+        return res.status(409).json({ error: "Conflict Error" });
+    }
+
+
+    const newId = products.length > 0 ? products[products.length - 1].id + 1 : 1;
+    const addedProduct = { 
+        id: newId, 
+        name: name.trim(), 
+        price, 
+        category: category.trim(),
+        ...(image && { image })
+    };
+
+    products.push(addedProduct);
+    res.status(201).json({
+        message: "Продукт успешно добавлен!",
+        product: addedProduct
+    });
+});
+
 app.listen(PORT, HOST, () => {
-    console.log(`Server is running on http://${HOST}:${PORT}/timestamp`);
-    console.log(`Server is running on http://${HOST}:${PORT}/health`);
-    console.log(`Server is running on http://${HOST}:${PORT}/stats`);
     console.log(`Server is running on http://${HOST}:${PORT}/products`);
 });
