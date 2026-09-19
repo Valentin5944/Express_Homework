@@ -79,12 +79,7 @@ app.post('/products', (req, res) => {
 
 
     const newId = products.length > 0 ? products[products.length - 1].id + 1 : 1;
-    const addedProduct = { 
-        id: newId, 
-        name: name.trim(), 
-        price, 
-        category: category.trim(),
-        ...(image && { image })
+    const addedProduct = { id: newId, name: name.trim(), price, category: category.trim(), ...(image && { image })
     };
 
     products.push(addedProduct);
