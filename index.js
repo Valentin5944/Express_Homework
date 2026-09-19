@@ -2,19 +2,21 @@ import express from "express"
 
 const app = express();
 
-// ОБОВ'ЯЗКОВО: додаємо middleware для читання JSON з Postman
-app.use(express.json());
-
 const HOST = 'localhost';
 const PORT = 3000;
 
 app.get('/timestamp', (req, res) => {
     const currentDate = new Date();
-    res.json({ timestamp: currentDate.toISOString() });
+
+    res.json({
+        timestamp: currentDate.toISOString()
+    });
 });
 
 app.get('/health', (req, res) => {
-    res.json({ status: "ok" });
+    res.json({
+        status: "ok"
+    });
 });
 
 app.get('/stats', (req, res) => {
@@ -61,7 +63,7 @@ app.post('/products', (req, res) => {
     if (req.query.fail === 'true') {
         return res.status(500).json({ error: "Помилка при додаванні продукту" });
     }
-    
+
     const { name, price, category, image } = req.body;
 
     if (!name || typeof name !== 'string' || name.trim().length === 0 || !Number.isInteger(price) || price <= 0 || !category || typeof category !== 'string' || category.trim().length === 0 || image && typeof image !== 'string') {
@@ -89,5 +91,8 @@ app.post('/products', (req, res) => {
 });
 
 app.listen(PORT, HOST, () => {
+    console.log(`Server is running on http://${HOST}:${PORT}/timestamp`);
+    console.log(`Server is running on http://${HOST}:${PORT}/health`);
+    console.log(`Server is running on http://${HOST}:${PORT}/stats`);
     console.log(`Server is running on http://${HOST}:${PORT}/products`);
 });
